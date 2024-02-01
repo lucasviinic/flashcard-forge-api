@@ -1,0 +1,110 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+venv3/
+__venv__/
+
+# .env file
+.env
+
+# IDE (por exemplo, VSCode)
+.vscode/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Pycache files
+__pycache__/
+
+# Type hinting cache
+.pyre/
+
+# Distribution / packaging
+.Python
+env/
+build/
+dist/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+__pycache__/
+*.egg-info/
+*.egg
+*.egg-info/
+
+# MyPy
+.mypy_cache/
+
+# PyInstaller
+dist/
+build/
+*.exe
+*.spec
+
+# pytest
+__pycache__/
+.pytest_cache/
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.tox/
+
+# Translation files
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Environments
+.env
+
+# FastAPI auto-generated files
+api_docs/
+
+# Ignore pipenv virtual environment
+Pipfile
+Pipfile.lock
