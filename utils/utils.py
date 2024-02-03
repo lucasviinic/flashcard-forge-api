@@ -9,10 +9,9 @@ dotenv.load_dotenv()
 def pdf_to_text(pdf) -> str:
     text = ''
     try:
-        with open(pdf, 'rb') as file:
-            reader = PyPDF2.PdfReader(file)
-            for page_num in range(len(reader.pages)):
-                text += reader.pages[page_num].extract_text()
+        reader = PyPDF2.PdfReader(pdf)
+        for page_num in range(len(reader.pages)):
+            text += reader.pages[page_num].extract_text()
     except Exception as e:
         raise RuntimeError(f"Error processing PDF file: {e}")
 
