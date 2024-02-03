@@ -15,7 +15,7 @@ def generate_flashcards_usecase(content: str, quantity: int) -> List[dict]:
                 history=generated_flashcards, quantity=quantity)
             generated_flashcards.extend(flashcards_list)
     else:
-        generated_flashcards = openai_client.flash_card_generator(prompt=piece,\
+        generated_flashcards = openai_client.flash_card_generator(prompt=content,\
             history=generated_flashcards, quantity=quantity)
         
     return generated_flashcards
