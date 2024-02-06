@@ -23,7 +23,8 @@ def flash_card_generator(prompt: str, history: str, quantity: int):
             ## A resposta deve SEMPRE ter o formato abaixo:
             {json.dumps(constants.FLASHCARDS_RESPONSE_TEMPLATE)}
             """
-            response = client.chat.completions.create(messages=[
+            response = client.chat.completions.create(
+            messages=[
                 {
                     "role": "system",
                     "content": system_prompt
@@ -33,12 +34,13 @@ def flash_card_generator(prompt: str, history: str, quantity: int):
                     "content": prompt
                 }
             ],
-            temperature = 1,
-            max_tokens = 256,
-            top_p = 1,
-            frequency_penalty = 0,
-            presence_penalty= 0 ,
-            model = model)
+            temperature=1,
+            max_tokens=256,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+            model=model
+            )
 
             response = json.loads(response.choices[0].message.content)
             return response

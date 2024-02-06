@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from database import engine
-import models
-from routers import flashcards
+import database
+from routers import flashcards, auth
 
 
 app = FastAPI()
 
-#models.Base.metadata.create_all(bind=engine)
+database.Base.metadata.create_all(bind=engine)
 
 app.include_router(flashcards.router)
+app.include_router(auth.router)
