@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 from pydantic import BaseModel, Field
 from starlette import status
@@ -48,6 +49,7 @@ async def update_subject(user: user_dependency, db: db_dependency, subject_reque
         raise HTTPException(status_code=404, detail='subject not found')
     
     subject_model.subject_name = subject_request.subject_name
+    subject_model.updated_at = datetime.now()
 
     db.add(subject_model)
     db.commit()
@@ -76,5 +78,7 @@ async def delete_subject(user: user_dependency, db: db_dependency, subject_id: i
     if not subject_model:
         raise HTTPException(status_code=404, detail='subject not found')
     
-    db.query(Subjects).filter(Subjects.id == subject_id).filter(Subjects.user_id == user.get('id')).delete()
+    subject_model.deleted_at = datetime.now()
+    
+    db.add(subject_model)
     db.commit()
