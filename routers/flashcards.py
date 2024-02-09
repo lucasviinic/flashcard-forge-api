@@ -7,9 +7,12 @@ from usecases.flashcards import generate_flashcards_usecase
 from fastapi import APIRouter, HTTPException, UploadFile
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/flashcards',
+    tags=['flashcards']
+)
 
-@router.post("/flashcards", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def generate_flashcards(file: UploadFile, quantity: int = 5):
     try:
         text_content = pdf_to_text(pdf=file.file)

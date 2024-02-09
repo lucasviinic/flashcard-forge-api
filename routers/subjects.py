@@ -9,14 +9,17 @@ from usecases.auth import get_current_user_usecase
 from database import db_dependency
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/subjects',
+    tags=['subjects']
+)
 
 user_dependency = Annotated[dict, Depends(get_current_user_usecase)]
 
 class SubjectRequest(BaseModel):
     subject_name: str = Field(min_length=3, max_length=30)
 
-@router.post("/subjects", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_subject(db: db_dependency, user: user_dependency, subject_request: SubjectRequest):    
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
@@ -26,14 +29,14 @@ async def create_subject(db: db_dependency, user: user_dependency, subject_reque
     db.add(subject_model)
     db.commit()
 
-@router.get("/subjects")
+@router.get("/")
 async def retrieve_all_subjects(user: user_dependency, db: db_dependency):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
     return db.query(Subjects).filter(Subjects.user_id == user.get('id')).all()
 
-@router.put("/subjects/{subject_id}")
+@router.put("/{subject_id}")
 async def update_subject(user: user_dependency, db: db_dependency, subject_request: SubjectRequest, subject_id: int = Path(gt=0)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
@@ -49,7 +52,7 @@ async def update_subject(user: user_dependency, db: db_dependency, subject_reque
     db.add(subject_model)
     db.commit()
 
-@router.get("/subjects/{subject_id}", status_code=status.HTTP_200_OK)
+@router.get("/{subject_id}", status_code=status.HTTP_200_OK)
 async def retrieve_subject(user: user_dependency, db: db_dependency, subject_id: int = Path(gt=0)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
@@ -62,7 +65,7 @@ async def retrieve_subject(user: user_dependency, db: db_dependency, subject_id:
     
     return subject_model
     
-@router.delete("/subjects/{subject_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{subject_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_subject(user: user_dependency, db: db_dependency, subject_id: int = Path(gt=0)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
