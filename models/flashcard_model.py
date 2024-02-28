@@ -6,6 +6,7 @@ class Flashcards(Base):
     __tablename__ = 'flashcards'
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
     subject_id = Column(Integer, ForeignKey('subjects.id'))
     topic_id = Column(Integer, ForeignKey('topics.id'))
     question = Column(String, nullable=False)
