@@ -12,6 +12,10 @@ um dos maiores desafios para aqueles que adotam essa estratégia é a criação 
 Em cenários mais desafiadores, como ao lidar com um capítulo extenso sobre genética, essa tarefa pode consumir um tempo considerável e valioso.
 Diante desse desafio, dei início a este projeto para auxiliar aqueles na jornada massiva de estudos, espero estar ajudando um pouco.
 
+### Mobile App
+
+Para acessar o repositório da aplicação mobile, <a href="https://github.com/lucasviinic/flashcard_forge_app">clique aqui</a>.
+
 ### Progresso
 
 Para verificar o andamento atual do projeto e consultar as próximas etapas planejadas, por favor, acesse o link do projeto <a href="https://github.com/users/lucasviinic/projects/3/views/1">clicando aqui</a>
