@@ -23,6 +23,7 @@ class FlashcardRequest(BaseModel):
     topic_id: int
     question: str
     answer: str
+    difficulty: int
     image_url: Optional[str] = None
 
 class FlashcardsList(BaseModel):
