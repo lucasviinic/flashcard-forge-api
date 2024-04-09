@@ -6,7 +6,6 @@ from models.flashcard_model import Flashcards
 from usecases.auth import get_current_user_usecase
 
 from utils import constants, pdf_to_text
-from usecases.flashcards import generate_flashcards_usecase
 from database import db_dependency
 
 from fastapi import APIRouter, Depends, HTTPException, Path, UploadFile

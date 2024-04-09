@@ -1,8 +1,10 @@
+from typing import List
+from pydantic import BaseModel
 from database import Base
 from sqlalchemy import Column, DateTime, Integer, Interval, String, func
 
 
-class Session(Base):
+class Sessions(Base):
     __tablename__ = 'sessions'
 
     id = Column(Integer, primary_key=True, index=True, comment="Unique identifier")
@@ -14,3 +16,16 @@ class Session(Base):
     created_at = Column(DateTime, default=func.now(), comment="Record creation date")
     updated_at = Column(DateTime, comment="Record update date")
     deleted_at = Column(DateTime, comment="Record deletion date")
+
+class FlashcardRequest(BaseModel):
+    flashcard_id: int
+    response: bool
+    difficulty: int
+
+class SessionRequest(BaseModel):
+    score: str
+    time: str
+    easy: int
+    medium: int
+    hard: int
+    flashcards: List[FlashcardRequest]

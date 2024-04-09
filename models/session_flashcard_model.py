@@ -2,7 +2,7 @@ from database import Base
 from sqlalchemy import Column, DateTime, ForeignKey, Boolean, Integer, Interval, String, func
 
 
-class SessionFlashcard(Base):
+class SessionFlashcards(Base):
     __tablename__ = 'session_flashcard'
 
     id = Column(Integer, primary_key=True, index=True, comment="Unique identifier")
