@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from database import engine
 import database
-from routers import flashcards, auth, subjects, topics
+from routers import flashcards, auth, subjects, topics, sessions
 
 
 app = FastAPI()
@@ -12,3 +12,4 @@ app.include_router(auth.router)
 app.include_router(flashcards.router)
 app.include_router(subjects.router)
 app.include_router(topics.router)
+app.include_router(sessions.router)
