@@ -1,4 +1,4 @@
-"""create_session_table
+"""create_sessions_table
 
 Revision ID: c722c276ce28
 Revises: 2b3dd5230497
