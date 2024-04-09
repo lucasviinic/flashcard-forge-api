@@ -3,13 +3,19 @@ from sqlalchemy import Column, DateTime, ForeignKey, Boolean, Integer, Interval,
 
 
 class SessionFlashcards(Base):
-    __tablename__ = 'session_flashcard'
+    __tablename__ = 'session_flashcards'
 
     id = Column(Integer, primary_key=True, index=True, comment="Unique identifier")
     session_id = Column(Integer, ForeignKey('sessions.id'), comment="Reference to session record ID")
-    flashcard_id = Column(Integer, ForeignKey('flashcards.id'), comment="Reference to flashcard record ID"),
+    flashcard_id = Column(Integer, ForeignKey('flashcards.id'), comment="Reference to flashcard record ID")
     response = Column(Boolean, nullable=False, comment="Answer given (correct or not)")
     difficulty = Column(Integer, nullable=False, comment="Flashcard difficulty, which can be 0, 1 or 2")
     created_at = Column(DateTime, default=func.now(), comment="Record creation date")
     updated_at = Column(DateTime, comment="Record update date")
     deleted_at = Column(DateTime, comment="Record deletion date")
+
+    def to_dict(self):
+        """
+        Converts a SQLAlchemy object to a dictionary.
+        """
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
