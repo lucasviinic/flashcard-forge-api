@@ -25,7 +25,7 @@ def authenticate_user_usecase(username: str, passowrd: str, db):
 
 def create_access_token_usecase(username: str, user_id: int, expires_delta: timedelta):
     encode = {'sub': username, 'id': user_id}
-    expire = datetime.utcnow() + expires_delta
+    expire = datetime.now() + expires_delta
     encode.update({'exp': expire})
 
     return jwt.encode(encode, os.getenv('SECRET_KEY'), algorithm=os.getenv('ALGORITHM'))

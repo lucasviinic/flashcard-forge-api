@@ -109,7 +109,7 @@ async def refresh_access_token(refresh_token: str, db: db_dependency):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid refresh token.')
 
     access_token = create_access_token_usecase(user.username, user.id, timedelta(minutes=20))
-    new_refresh_token = secrets.token_hex(32)  # Gera um novo refresh token
+    new_refresh_token = secrets.token_hex(32)
 
     user.refresh_token = new_refresh_token
     db.commit()
