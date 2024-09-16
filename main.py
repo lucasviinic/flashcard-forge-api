@@ -15,6 +15,7 @@ async def middleware(request: Request, call_next):
         return await call_next(request)
     
     token = request.headers.get("Authorization")
+
     if token:
         try:
             token = token.split(" ")[1]
