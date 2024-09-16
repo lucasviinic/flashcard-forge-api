@@ -1,12 +1,13 @@
+import uuid
 from database import Base
-from sqlalchemy import Column, ForeignKey, Boolean, Integer, String, DateTime, func
+from sqlalchemy import UUID, Column, ForeignKey, Boolean, Integer, String, DateTime, func
 
 
 class Flashcards(Base):
     __tablename__ = 'flashcards'
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     subject_id = Column(Integer, ForeignKey('subjects.id'))
     topic_id = Column(Integer, ForeignKey('topics.id'))
     question = Column(String, nullable=False)

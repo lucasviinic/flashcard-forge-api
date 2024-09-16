@@ -1,14 +1,15 @@
 from typing import List
+import uuid
 from pydantic import BaseModel
 from database import Base
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Interval, String, func
+from sqlalchemy import UUID, Column, DateTime, ForeignKey, Integer, Interval, String, func
 
 
 class Sessions(Base):
     __tablename__ = 'sessions'
 
-    id = Column(Integer, primary_key=True, index=True, comment="Unique identifier")
-    topic_id = Column(Integer, ForeignKey('topics.id'), comment="Reference to topic record ID")
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4, comment="Unique identifier")
+    topic_id = Column(UUID(as_uuid=True), ForeignKey("topics.id"), comment="Reference to topic record ID")
     score = Column(String, nullable=False, comment="User score, e.g. 7/20")
     time = Column(Interval, nullable=False, comment="Study session duration 00:09:31")
     easy = Column(Integer, nullable=False, comment="Number of easy flashcards")
