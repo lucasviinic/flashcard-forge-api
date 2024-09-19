@@ -1,10 +1,11 @@
+from datetime import datetime, timezone
 from typing import List
 
-from models.session_flashcards_model import SessionFlashcards
-from models.session_model import SessionFlashcardRequest, Sessions
+from fastapi import HTTPException
 from database import db_dependency
-from models.subject_model import Subjects
-from models.topic_model import Topics 
+from models.subject_model import SubjectRequest, Subjects
+from models.topic_model import Topics
+
 
 def retrieve_all_subjects_usecase(db: db_dependency, user_id: str, limit: int = 10, offset: int = 0) -> List[dict]:
     subjects = db.query(Subjects).filter(Subjects.user_id == user_id)\
@@ -28,3 +29,53 @@ def retrieve_all_subjects_usecase(db: db_dependency, user_id: str, limit: int = 
         })
     
     return result
+
+def create_subject_usecase(db: db_dependency, subject_request: SubjectRequest, user_id: str) -> dict:
+    subject_model = Subjects(**subject_request.model_dump(), user_id=user_id)
+
+    db.add(subject_model)
+    db.commit()
+
+    result = subject_model.to_dict()
+
+    return result
+
+def update_subject_usecase(db: db_dependency, subject_request: SubjectRequest, subject_id: str, user_id: str) -> dict:
+    subject_model = db.query(Subjects).filter(Subjects.id == subject_id)\
+        .filter(Subjects.user_id == user_id).first()
+    
+    if not subject_model:
+        raise HTTPException(status_code=404, detail='subject not found')
+    
+    subject_model.subject_name = subject_request.subject_name
+    subject_model.updated_at = datetime.now(timezone.utc)
+
+    db.add(subject_model)
+    db.commit()
+
+    result = subject_model.to_dict()
+
+    return result
+
+def retrieve_subject_usecase(db: db_dependency, subject_id: str, user_id: str) -> dict:
+    subject_model = db.query(Subjects).filter(Subjects.id == subject_id)\
+        .filter(Subjects.user_id == user_id).filter(Subjects.deleted_at == None).first()
+
+    if not subject_model:
+        raise HTTPException(status_code=404, detail='subject not found')
+    
+    result = subject_model.to_dict()
+
+    return result
+
+def delete_subject_usecase(db: db_dependency, subject_id: str, user_id: str) -> None:
+    subject_model = db.query(Subjects).filter(Subjects.id == subject_id)\
+        .filter(Subjects.user_id == user_id).first()
+    
+    if not subject_model:
+        raise HTTPException(status_code=404, detail='subject not found')
+    
+    subject_model.deleted_at = datetime.now()
+    
+    db.add(subject_model)
+    db.commit()

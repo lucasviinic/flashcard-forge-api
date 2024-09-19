@@ -1,4 +1,6 @@
 import uuid
+
+from pydantic import BaseModel, Field
 from database import Base
 from sqlalchemy import UUID, Column, ForeignKey, Integer, String, DateTime, func, inspect
 
@@ -16,3 +18,6 @@ class Subjects(Base):
 
     def to_dict(self):
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
+    
+class SubjectRequest(BaseModel):
+    subject_name: str = Field(min_length=3, max_length=30)
