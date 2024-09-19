@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path
 from models.subject_model import Subjects
 from usecases.auth import get_current_user_usecase
 from database import db_dependency
+from usecases.subjects import retrieve_all_subjects_usecase
 
 
 router = APIRouter(
@@ -39,8 +40,9 @@ async def retrieve_all_subjects(user: user_dependency, db: db_dependency):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    return db.query(Subjects).filter(Subjects.user_id == user.get('id'))\
-        .filter(Subjects.deleted_at == None).all()
+    result = retrieve_all_subjects_usecase(db, user_id=user.get('id'))
+
+    return result
 
 @router.put("/{subject_id}")
 async def update_subject(user: user_dependency, db: db_dependency, subject_request: SubjectRequest, subject_id: str):

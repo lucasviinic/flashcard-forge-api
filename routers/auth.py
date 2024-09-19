@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import secrets
 from typing import Annotated
 
@@ -74,6 +74,7 @@ async def signin(google_signin_request: GoogleSignInRequest, db: db_dependency):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid Google access token.')
 
     user_info = response.json()
+
     google_id = user_info.get('id')
     email = user_info.get('email')
     name = user_info.get('name', '')
@@ -91,7 +92,7 @@ async def signin(google_signin_request: GoogleSignInRequest, db: db_dependency):
         )
         db.add(user)
     else:
-        user.last_login = datetime.now()
+        user.last_login = datetime.now(timezone.utc)
 
     access_token = create_access_token_usecase(user.name, str(user.id), timedelta(minutes=20))
     refresh_token = secrets.token_hex(32)
