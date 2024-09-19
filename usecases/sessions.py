@@ -1,7 +1,8 @@
 from typing import List
 
+from models.requests_model import SessionFlashcardRequest
 from models.session_flashcards_model import SessionFlashcards
-from models.session_model import SessionFlashcardRequest, Sessions
+from models.session_model import Sessions
 from database import db_dependency
 
 

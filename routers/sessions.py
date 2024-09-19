@@ -4,7 +4,7 @@ from starlette import status
 
 from database import db_dependency
 
-from models.session_model import SessionFlashcardRequest
+from models.requests_model import SessionFlashcardRequest
 from usecases.auth import get_current_user_usecase
 from usecases.sessions import create_session_usecase, retrieve_sessions_usecase
 

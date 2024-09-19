@@ -1,14 +1,13 @@
 from typing import Annotated
-from pydantic import BaseModel, Field
 from starlette import status
 
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Query
 
-from models.topic_model import Topics
+from models.requests_model import TopicRequest
 from usecases.auth import get_current_user_usecase
 from database import db_dependency
 
-from datetime import datetime
+from usecases.topics import create_topic_usecase, delete_topic_usecase, retrieve_all_topics_usecase, retrieve_topic_usecase, update_topic_usecase
 
 
 router = APIRouter(
@@ -18,64 +17,45 @@ router = APIRouter(
 
 user_dependency = Annotated[dict, Depends(get_current_user_usecase)]
 
-class TopicRequest(BaseModel):
-    topic_name: str = Field(min_length=3, max_length=30)
-    subject_id: int
-
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_topic(db: db_dependency, user: user_dependency, topic_request: TopicRequest):
+@router.post("/{subject_id}", status_code=status.HTTP_201_CREATED)
+async def create_topic(db: db_dependency, user: user_dependency, subject_id, topic_request: TopicRequest):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    topic_model = Topics(**topic_request.model_dump())
+    response = create_topic_usecase(db, subject_id, topic_request)
 
-    db.add(topic_model)
-    db.commit()
+    return response
 
 @router.get("/{subject_id}", status_code=status.HTTP_200_OK)
-async def retrieve_all_topics(user: user_dependency, db: db_dependency, subject_id: int = Path(gt=0)):
+async def retrieve_all_topics(user: user_dependency, db: db_dependency, subject_id: str):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    return db.query(Topics).filter(Topics.subject_id == subject_id).all()
+    response = retrieve_all_topics_usecase(db, subject_id)
 
-@router.put("/{topic_id}")
-async def update_topic(user: user_dependency, db: db_dependency, topic_request: TopicRequest, topic_id: int = Path(gt=0)):
+    return response
+
+@router.put("/{subject_id}")
+async def update_topic(user: user_dependency, db: db_dependency, topic_request: TopicRequest, subject_id: str, topic_id: str = Query(...)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    topic_model = db.query(Topics).filter(Topics.id == topic_id).first()
-
-    if not topic_model:
-        raise HTTPException(status_code=404, detail='topic not found')
-
-    topic_model.topic_name = topic_request.topic_name
-    topic_model.updated_at = datetime.now()
+    response = update_topic_usecase(db, subject_id, topic_request, topic_id)
     
-    db.add(topic_model)
-    db.commit()
+    return response
 
-@router.get("/{topic_id}", status_code=status.HTTP_200_OK)
-async def retrieve_topic(user: user_dependency, db: db_dependency, topic_id: int = Path(gt=0)):
+@router.get("/{subject_id}", status_code=status.HTTP_200_OK)
+async def retrieve_topic(user: user_dependency, db: db_dependency, subject_id: str, topic_id: str = Query(...)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    topic_model = db.query(Topics).filter(Topics.id == topic_id).first()
+    response = retrieve_topic_usecase(db, subject_id, topic_id)
 
-    if not topic_model:
-        raise HTTPException(status_code=404, detail='topic not found')
-    
-    return topic_model
+    return response
 
-@router.delete("/{topic_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_topic(user: user_dependency, db: db_dependency, topic_id: int = Path(gt=0)):
+@router.delete("/{subject_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_topic(user: user_dependency, db: db_dependency, subject_id: str, topic_id: str = Query(...)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    topic_model = db.query(Topics).filter(Topics.id == topic_id).first()
-
-    if not topic_model:
-        raise HTTPException(status_code=404, detail='topic not found')
-    
-    db.query(Topics).filter(Topics.id == topic_id).delete()
-    db.commit()
+    delete_topic_usecase(db, subject_id, topic_id)

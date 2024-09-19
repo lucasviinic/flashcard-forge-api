@@ -24,20 +24,3 @@ class Sessions(Base):
         Converts a SQLAlchemy object to a dictionary.
         """
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
-
-class FlashcardRequest(BaseModel):
-    flashcard_id: int
-    response: bool
-    difficulty: int
-
-class SessionRequest(BaseModel):
-    topic_id: int
-    score: str
-    time: str
-    easy: int
-    medium: int
-    hard: int
-
-class SessionFlashcardRequest(BaseModel):
-    session: SessionRequest
-    flashcards: List[FlashcardRequest]

@@ -3,7 +3,8 @@ from typing import List
 
 from fastapi import HTTPException
 from database import db_dependency
-from models.subject_model import SubjectRequest, Subjects
+from models.requests_model import SubjectRequest
+from models.subject_model import Subjects
 from models.topic_model import Topics
 
 

@@ -1,13 +1,12 @@
-from datetime import datetime
 from typing import Annotated
 from starlette import status
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from models.subject_model import SubjectRequest, Subjects
+from models.requests_model import SubjectRequest
 from usecases.auth import get_current_user_usecase
 from database import db_dependency
-from usecases.subjects import create_subject_usecase, retrieve_all_subjects_usecase, retrieve_subject_usecase, update_subject_usecase
+from usecases.subjects import create_subject_usecase, delete_subject_usecase, retrieve_all_subjects_usecase, retrieve_subject_usecase, update_subject_usecase
 
 
 router = APIRouter(
@@ -49,7 +48,7 @@ async def retrieve_subject(user: user_dependency, db: db_dependency, subject_id:
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    response = retrieve_subject_usecase()
+    response = retrieve_subject_usecase(db, subject_id, user_id=user.get('id'))
     
     return response
     
@@ -58,13 +57,4 @@ async def delete_subject(user: user_dependency, db: db_dependency, subject_id: s
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    subject_model = db.query(Subjects).filter(Subjects.id == subject_id)\
-        .filter(Subjects.user_id == user.get('id')).first()
-    
-    if not subject_model:
-        raise HTTPException(status_code=404, detail='subject not found')
-    
-    subject_model.deleted_at = datetime.now()
-    
-    db.add(subject_model)
-    db.commit()
+    delete_subject_usecase(db, subject_id, user_id=user.get('id'))
