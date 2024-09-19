@@ -1,14 +1,15 @@
 from datetime import datetime
-from typing import Annotated, List, Optional
-from pydantic import BaseModel
+from typing import Annotated, List
 from starlette import status
 from models.flashcard_model import Flashcards
+from models.requests_model import FlashcardRequest, FlashcardsListRequest
 from usecases.auth import get_current_user_usecase
 
+from usecases.flashcards import create_flashcards_usecase
 from utils import constants, pdf_to_text
 from database import db_dependency
 
-from fastapi import APIRouter, Depends, HTTPException, Path, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, UploadFile
 
 
 router = APIRouter(
@@ -18,16 +19,6 @@ router = APIRouter(
 
 user_dependency = Annotated[dict, Depends(get_current_user_usecase)]
 
-class FlashcardRequest(BaseModel):
-    subject_id: int
-    topic_id: int
-    question: str
-    answer: str
-    difficulty: int
-    image_url: Optional[str] = None
-
-class FlashcardsList(BaseModel):
-    data: List[FlashcardRequest]
 
 @router.post("/generate", status_code=status.HTTP_201_CREATED)
 async def generate_flashcards(file: UploadFile, quantity: int = 5):
@@ -41,21 +32,19 @@ async def generate_flashcards(file: UploadFile, quantity: int = 5):
     return {"flashcards": flashcards_list}
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_flashcards(db: db_dependency, user: user_dependency, flashcard_list: FlashcardsList):
+async def create_flashcards(db: db_dependency, user: user_dependency, flashcards_list: FlashcardsListRequest):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
 
-    flashcards = [Flashcards(**flashcard.model_dump(), user_id=user.get('id')) for flashcard in flashcard_list.data]
+    response = create_flashcards_usecase(db, flashcards_list, user_id=user.get('id'))
 
-    for flashcard in flashcards:
-        db.add(flashcard)
-        db.commit()
+    return response
 
 @router.get("/")
-async def retrieve_all_flashcards(user: user_dependency, db: db_dependency):
+async def retrieve_all_flashcards(user: user_dependency, db: db_dependency, topic_id: str = Query(...)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
-    return db.query(Flashcards).filter(
+    return db.query(Flashcards).filter(Flashcards.topic_id == topic_id,
         Flashcards.user_id == user.get('id'), Flashcards.deleted_at == None).all()
 
 @router.delete("/{flashcard_id}", status_code=status.HTTP_204_NO_CONTENT)

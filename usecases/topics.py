@@ -14,6 +14,7 @@ def create_topic_usecase(db: db_dependency, subject_id: str, topic_request: Topi
 
     db.add(topic_model)
     db.commit()
+    db.refresh(topic_model)
 
     result = topic_model.to_dict()
 

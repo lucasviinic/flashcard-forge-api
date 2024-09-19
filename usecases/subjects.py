@@ -36,6 +36,7 @@ def create_subject_usecase(db: db_dependency, subject_request: SubjectRequest, u
 
     db.add(subject_model)
     db.commit()
+    db.refresh(subject_model)
 
     result = subject_model.to_dict()
 

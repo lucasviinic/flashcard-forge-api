@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -24,3 +24,14 @@ class SessionRequest(BaseModel):
 class SessionFlashcardRequest(BaseModel):
     session: SessionRequest
     flashcards: List[FlashcardRequest]
+
+class FlashcardRequest(BaseModel):
+    subject_id: int
+    topic_id: int
+    question: str
+    answer: str
+    difficulty: int
+    image_url: Optional[str] = None
+
+class FlashcardsListRequest(BaseModel):
+    data: List[FlashcardRequest]
