@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Annotated
-from pydantic import BaseModel, Field
 from starlette import status
 
 from fastapi import APIRouter, Depends, HTTPException

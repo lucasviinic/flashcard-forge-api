@@ -35,32 +35,6 @@ class CreateUserRequest(BaseModel):
     last_name: str
     password: str
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
-    create_user_model = Users(
-        email=create_user_request.email,
-        username=create_user_request.username,
-        first_name=create_user_request.first_name,
-        last_name=create_user_request.last_name,
-        hashed_password=bcrypt_context.hash(create_user_request.password),
-        is_active=True
-    )
-
-    db.add(create_user_model)
-    db.commit()
-
-@router.post("/login", response_model=Token)
-async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
-    user = authenticate_user_usecase(form_data.username, form_data.password, db)
-
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='could not validate user.')
-
-    token = create_access_token_usecase(user.username, user.id, timedelta(minutes=20))
-
-    return {'access_token': token, 'token_type': 'bearer'}
-
-
 @router.post("/signin", response_model=Token)
 async def signin(google_signin_request: GoogleSignInRequest, db: db_dependency):
     token = google_signin_request.access_token
