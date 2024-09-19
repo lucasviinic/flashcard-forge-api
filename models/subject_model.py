@@ -1,6 +1,6 @@
 import uuid
 from database import Base
-from sqlalchemy import UUID, Column, ForeignKey, Integer, String, DateTime, func
+from sqlalchemy import UUID, Column, ForeignKey, Integer, String, DateTime, func, inspect
 
 
 class Subjects(Base):
@@ -11,5 +11,8 @@ class Subjects(Base):
     image_url = Column(String)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime)
+    updated_at = Column(DateTime, default=func.now())
     deleted_at = Column(DateTime)
+
+    def to_dict(self):
+        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}

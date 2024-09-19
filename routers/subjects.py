@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated
 from pydantic import BaseModel, Field
 from starlette import status
@@ -30,15 +30,20 @@ async def create_subject(db: db_dependency, user: user_dependency, subject_reque
     db.add(subject_model)
     db.commit()
 
+    response = subject_model.to_dict()
+
+    return response
+
 @router.get("/")
 async def retrieve_all_subjects(user: user_dependency, db: db_dependency):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    return db.query(Subjects).filter(Subjects.user_id == user.get('id')).all()
+    return db.query(Subjects).filter(Subjects.user_id == user.get('id'))\
+        .filter(Subjects.deleted_at == None).all()
 
 @router.put("/{subject_id}")
-async def update_subject(user: user_dependency, db: db_dependency, subject_request: SubjectRequest, subject_id: int = Path(gt=0)):
+async def update_subject(user: user_dependency, db: db_dependency, subject_request: SubjectRequest, subject_id: str):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
@@ -49,26 +54,32 @@ async def update_subject(user: user_dependency, db: db_dependency, subject_reque
         raise HTTPException(status_code=404, detail='subject not found')
     
     subject_model.subject_name = subject_request.subject_name
-    subject_model.updated_at = datetime.now()
+    subject_model.updated_at = datetime.now(timezone.utc)
 
     db.add(subject_model)
     db.commit()
 
+    response = subject_model.to_dict()
+
+    return response
+
 @router.get("/{subject_id}", status_code=status.HTTP_200_OK)
-async def retrieve_subject(user: user_dependency, db: db_dependency, subject_id: int = Path(gt=0)):
+async def retrieve_subject(user: user_dependency, db: db_dependency, subject_id: str):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
     subject_model = db.query(Subjects).filter(Subjects.id == subject_id)\
-        .filter(Subjects.user_id == user.get('id')).first()
+        .filter(Subjects.user_id == user.get('id')).filter(Subjects.deleted_at == None).first()
 
     if not subject_model:
         raise HTTPException(status_code=404, detail='subject not found')
     
-    return subject_model
+    response = subject_model.to_dict()
+    
+    return response
     
 @router.delete("/{subject_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_subject(user: user_dependency, db: db_dependency, subject_id: int = Path(gt=0)):
+async def delete_subject(user: user_dependency, db: db_dependency, subject_id: str):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     

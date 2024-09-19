@@ -93,7 +93,7 @@ async def signin(google_signin_request: GoogleSignInRequest, db: db_dependency):
     else:
         user.last_login = datetime.now()
 
-    access_token = create_access_token_usecase(user.name, user.id, timedelta(minutes=20))
+    access_token = create_access_token_usecase(user.name, str(user.id), timedelta(minutes=20))
     refresh_token = secrets.token_hex(32)
 
     user.refresh_token = refresh_token
@@ -108,7 +108,7 @@ async def refresh_access_token(refresh_token: str, db: db_dependency):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid refresh token.')
 
-    access_token = create_access_token_usecase(user.username, user.id, timedelta(minutes=20))
+    access_token = create_access_token_usecase(user.name, user.id, timedelta(minutes=20))
     new_refresh_token = secrets.token_hex(32)
 
     user.refresh_token = new_refresh_token

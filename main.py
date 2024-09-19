@@ -20,7 +20,7 @@ async def middleware(request: Request, call_next):
         try:
             token = token.split(" ")[1]
             payload = jwt.decode(token, os.getenv('SECRET_KEY'), algorithms=[os.getenv('ALGORITHM')])
-            user_id = payload.get("sub")
+            user_id = payload.get("id")
             if user_id is None:
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         except JWTError:

@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
@@ -12,7 +12,7 @@ from models.user_model import Users
 
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/signin')
 
 def authenticate_user_usecase(username: str, passowrd: str, db):
     user = db.query(Users).filter(Users.username == username).first()
@@ -25,7 +25,7 @@ def authenticate_user_usecase(username: str, passowrd: str, db):
 
 def create_access_token_usecase(username: str, user_id: int, expires_delta: timedelta):
     encode = {'sub': username, 'id': user_id}
-    expire = datetime.now() + expires_delta
+    expire = datetime.now(timezone.utc) + expires_delta
     encode.update({'exp': expire})
 
     return jwt.encode(encode, os.getenv('SECRET_KEY'), algorithm=os.getenv('ALGORITHM'))
