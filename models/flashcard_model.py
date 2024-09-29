@@ -1,6 +1,6 @@
 import uuid
 from database import Base
-from sqlalchemy import UUID, Column, ForeignKey, Boolean, Integer, String, DateTime, func
+from sqlalchemy import UUID, CheckConstraint, Column, ForeignKey, Boolean, Integer, String, DateTime, func, inspect
 
 
 class Flashcards(Base):
@@ -18,3 +18,6 @@ class Flashcards(Base):
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime)
     deleted_at = Column(DateTime)
+
+    def to_dict(self):
+        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}

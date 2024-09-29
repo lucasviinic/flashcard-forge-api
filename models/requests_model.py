@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class TopicRequest(BaseModel):
@@ -26,12 +26,18 @@ class SessionFlashcardRequest(BaseModel):
     flashcards: List[FlashcardRequest]
 
 class FlashcardRequest(BaseModel):
-    subject_id: int
-    topic_id: int
+    subject_id: str
+    topic_id: str
     question: str
     answer: str
     difficulty: int
     image_url: Optional[str] = None
+
+    @validator('difficulty')
+    def check_difficulty(cls, value):
+        if value not in {0, 1, 2}:
+            raise ValueError('difficulty must be 0, 1, or 2')
+        return value
 
 class FlashcardsListRequest(BaseModel):
     data: List[FlashcardRequest]

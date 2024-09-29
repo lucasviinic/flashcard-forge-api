@@ -5,7 +5,7 @@ from models.flashcard_model import Flashcards
 from models.requests_model import FlashcardRequest, FlashcardsListRequest
 from usecases.auth import get_current_user_usecase
 
-from usecases.flashcards import create_flashcards_usecase, generate_flashcards_usecase
+from usecases.flashcards import create_flashcards_usecase, delete_flashcard_usecase, generate_flashcards_usecase, retrieve_all_flashcards_usecase, update_flashcard_usecase
 from utils import constants, pdf_to_text
 from database import db_dependency
 
@@ -34,47 +34,47 @@ async def create_flashcards(db: db_dependency, user: user_dependency, flashcards
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
 
-    response = create_flashcards_usecase(db, flashcards_list, user_id=user.get('id'))
+    try:
+        flashcards_created_list = create_flashcards_usecase(db, flashcards_list, user_id=user.get('id'))
+        response = {"flashcards": flashcards_created_list}
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating flashcards: {str(e)}")
 
     return response
 
 @router.get("/")
-async def retrieve_all_flashcards(user: user_dependency, db: db_dependency, topic_id: str = Query(...)):
+async def retrieve_all_flashcards(user: user_dependency, db: db_dependency, topic_id: str = Query(...), page: int = Query(1, ge=1), limit: int = Query(30, gt=0, le=30)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
-    return db.query(Flashcards).filter(Flashcards.topic_id == topic_id,
-        Flashcards.user_id == user.get('id'), Flashcards.deleted_at == None).all()
+    
+    try:
+        response = retrieve_all_flashcards_usecase(
+            db, topic_id=topic_id, user_id=user.get('id'), page=page, limit=limit)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error listing flashcards: {str(e)}")
+
+    return response
 
 @router.delete("/{flashcard_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_flashcard(user: user_dependency, db: db_dependency, flashcard_id: int = Path(gt=0)):
+async def delete_flashcard(user: user_dependency, db: db_dependency, flashcard_id: str):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    flashcard_model = db.query(Flashcards).filter(Flashcards.id == flashcard_id)\
-        .filter(Flashcards.user_id == user.get('id')).first()
-    
-    if not flashcard_model:
-        raise HTTPException(status_code=404, detail='flashcard not found')
-    
-    flashcard_model.deleted_at = datetime.now()
-    
-    db.add(flashcard_model)
-    db.commit()
+    try:
+        delete_flashcard_usecase(db, user.get('id'), flashcard_id)
+    except HTTPException as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error deleting flashcard: {str(e.detail)}")
+
+    return None
 
 @router.put("/{flashcard_id}")
-async def update_flashcard(user: user_dependency, db: db_dependency, flashcard_request: FlashcardRequest, flashcard_id: int = Path(gt=0)):
+async def update_flashcard(user: user_dependency, db: db_dependency, flashcard_request: FlashcardRequest, flashcard_id: str):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
-    
-    flashcard_model = db.query(Flashcards).filter(Flashcards.id == flashcard_id)\
-        .filter(Flashcards.user_id == user.get('id')).first()
-    
-    if not flashcard_model:
-        raise HTTPException(status_code=404, detail='flashcard not found')
-    
-    flashcard_model.question = flashcard_request.question
-    flashcard_model.answer = flashcard_request.answer
-    flashcard_model.updated_at = datetime.now()
 
-    db.add(flashcard_model)
-    db.commit()
+    try:
+        update_flashcard_usecase(db, user.get('id'), flashcard_id, flashcard_request)
+    except HTTPException as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error updating flashcard: {str(e.detail)}")
+
+    return {"detail": "Flashcard updated successfully"}
