@@ -1,1 +1,1 @@
-from .utils import pdf_to_text, token_counter
+from .utils import pdf_to_text, token_counter, fragment_text

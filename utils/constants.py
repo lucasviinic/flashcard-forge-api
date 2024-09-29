@@ -1,9 +1,11 @@
-FLASHCARDS_RESPONSE_TEMPLATE = [
-    {
-        "question": "question text in portuguese",
-        "answer": "answer text in portuguese"
-    }
-]
+FLASHCARDS_RESPONSE_TEMPLATE = {
+  "flashcards": [
+        {
+            "question": "conteúdo da pergunta contendo no máximo 100 caracteres",
+            "answer": "conteúdo da respostas contendo no máximo 100 caracteres"
+        }
+  ]
+}
 
 FLASHCARDS_RESPONSE_MOCK = [
     {

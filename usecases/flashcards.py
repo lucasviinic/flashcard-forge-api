@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 from models.flashcard_model import Flashcards
@@ -5,21 +6,17 @@ from models.requests_model import FlashcardsListRequest
 from utils import token_counter
 from core.openai import client as openai_client
 from database import db_dependency
+from utils.utils import fragment_text
 
 
-def generate_flashcards_usecase(content: str, quantity: int) -> List[dict]:
+def generate_flashcards_usecase(content: str, quantity: int, difficulty: int = 1) -> List[dict]:
     generated_flashcards = []
-    
-    if token_counter(content) > 1.6e4:
-        content_slices = []
-        #TODO: Adiciona slices
-        for piece in content_slices:
-            flashcards_list = openai_client.flash_card_generator(prompt=piece,\
-                history=generated_flashcards, quantity=quantity)
-            generated_flashcards.extend(flashcards_list)
-    else:
-        generated_flashcards = openai_client.flash_card_generator(prompt=content,\
-            history=generated_flashcards, quantity=quantity)
+    text_fragments = fragment_text(content)
+
+    for fragment in text_fragments:
+        flashcards_list = openai_client.flash_card_generator(prompt=fragment,\
+            history=generated_flashcards, quantity=quantity, difficulty=difficulty)
+        generated_flashcards.extend(flashcards_list)
         
     return generated_flashcards
         

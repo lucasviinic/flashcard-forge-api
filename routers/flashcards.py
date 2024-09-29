@@ -5,7 +5,7 @@ from models.flashcard_model import Flashcards
 from models.requests_model import FlashcardRequest, FlashcardsListRequest
 from usecases.auth import get_current_user_usecase
 
-from usecases.flashcards import create_flashcards_usecase
+from usecases.flashcards import create_flashcards_usecase, generate_flashcards_usecase
 from utils import constants, pdf_to_text
 from database import db_dependency
 
@@ -19,13 +19,11 @@ router = APIRouter(
 
 user_dependency = Annotated[dict, Depends(get_current_user_usecase)]
 
-
 @router.post("/generate", status_code=status.HTTP_201_CREATED)
-async def generate_flashcards(file: UploadFile, quantity: int = 5):
+async def generate_flashcards(file: UploadFile, quantity: int = Query(5, ge=1, le=10), difficulty: int = Query(1, ge=0, le=2)):
     try:
         text_content = pdf_to_text(pdf=file.file)
-        #flashcards_list = generate_flashcards_usecase(content=text_content, quantity=quantity)
-        flashcards_list = constants.FLASHCARDS_RESPONSE_MOCK
+        flashcards_list = generate_flashcards_usecase(content=text_content, quantity=quantity, difficulty=difficulty)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Erro durante a conversão do PDF: {str(e)}")
 
