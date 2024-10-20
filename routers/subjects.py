@@ -1,7 +1,7 @@
 from typing import Annotated
 from starlette import status
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from models.requests_model import SubjectRequest
 from usecases.auth import get_current_user_usecase
@@ -16,7 +16,7 @@ router = APIRouter(
 
 user_dependency = Annotated[dict, Depends(get_current_user_usecase)]
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_subject(db: db_dependency, user: user_dependency, subject_request: SubjectRequest):    
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
@@ -25,12 +25,18 @@ async def create_subject(db: db_dependency, user: user_dependency, subject_reque
 
     return response
 
-@router.get("/")
-async def retrieve_all_subjects(user: user_dependency, db: db_dependency):
+@router.get("")
+async def retrieve_all_subjects(
+    user: user_dependency,
+    db: db_dependency,
+    limit: int = Query(default=15, ge=1),
+    offset: int = Query(default=0, ge=0),
+    search: str = Query(default=None)
+):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    response = retrieve_all_subjects_usecase(db, user_id=user.get('id'))
+    response = retrieve_all_subjects_usecase(db, user_id=user.get('id'), limit=limit, offset=offset, search=search)
 
     return response
 

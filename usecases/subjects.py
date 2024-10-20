@@ -8,9 +8,13 @@ from models.subject_model import Subjects
 from models.topic_model import Topics
 
 
-def retrieve_all_subjects_usecase(db: db_dependency, user_id: str, limit: int = 10, offset: int = 0) -> List[dict]:
-    subjects = db.query(Subjects).filter(Subjects.user_id == user_id)\
-        .filter(Subjects.deleted_at == None).offset(offset).limit(limit).all()
+def retrieve_all_subjects_usecase(db: db_dependency, user_id: str, limit: int, offset: int, search: str) -> List[dict]:
+    query = db.query(Subjects).filter(Subjects.user_id == user_id).filter(Subjects.deleted_at == None)
+    
+    if search:
+        query = query.filter(Subjects.subject_name.ilike(f"%{search}%"))
+
+    subjects = query.offset(offset).limit(limit).all()
     
     result = []
     

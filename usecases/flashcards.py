@@ -24,19 +24,15 @@ def generate_flashcards_usecase(content: str, quantity: int, difficulty: int = 1
     return generated_flashcards
         
         
-def create_flashcards_usecase(db: db_dependency, flashcards_list: FlashcardsListRequest, user_id: str) -> List[dict]:
-    flashcards = [Flashcards(
-        **flashcard.model_dump(), 
-        user_id=user_id
-    ) for flashcard in flashcards_list.data]
+def create_flashcard_usecase(db: db_dependency, flashcard_request: FlashcardRequest, user_id: str) -> dict:
+    flashcard_model = Flashcards(**flashcard_request.model_dump())
+    flashcard_model.user_id = user_id
 
-    result = []
+    db.add(flashcard_model)
+    db.commit()
+    db.refresh(flashcard_model)
 
-    for flashcard in flashcards:
-        db.add(flashcard)
-        db.commit()
-        db.refresh(flashcard)
-        result.append(flashcard.to_dict())
+    result = flashcard_model.to_dict()
 
     return result
 

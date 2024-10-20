@@ -5,7 +5,7 @@ from models.flashcard_model import Flashcards
 from models.requests_model import FlashcardRequest, FlashcardsListRequest
 from usecases.auth import get_current_user_usecase
 
-from usecases.flashcards import create_flashcards_usecase, delete_flashcard_usecase, generate_flashcards_usecase, retrieve_all_flashcards_usecase, update_flashcard_usecase
+from usecases.flashcards import create_flashcard_usecase, delete_flashcard_usecase, generate_flashcards_usecase, retrieve_all_flashcards_usecase, update_flashcard_usecase
 from utils import constants, pdf_to_text
 from database import db_dependency
 
@@ -30,13 +30,13 @@ async def generate_flashcards(file: UploadFile, quantity: int = Query(5, ge=1, l
     return {"flashcards": flashcards_list}
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_flashcards(db: db_dependency, user: user_dependency, flashcards_list: FlashcardsListRequest):
+async def create_flashcards(db: db_dependency, user: user_dependency, flashcard_request: FlashcardRequest):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
 
     try:
-        flashcards_created_list = create_flashcards_usecase(db, flashcards_list, user_id=user.get('id'))
-        response = {"flashcards": flashcards_created_list}
+        flashcard_created = create_flashcard_usecase(db, flashcard_request, user_id=user.get('id'))
+        response = flashcard_created
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating flashcards: {str(e)}")
 
