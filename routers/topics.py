@@ -17,12 +17,12 @@ router = APIRouter(
 
 user_dependency = Annotated[dict, Depends(get_current_user_usecase)]
 
-@router.post("/{subject_id}", status_code=status.HTTP_201_CREATED)
-async def create_topic(db: db_dependency, user: user_dependency, subject_id, topic_request: TopicRequest):
+@router.post("", status_code=status.HTTP_201_CREATED)
+async def create_topic(db: db_dependency, user: user_dependency, topic_request: TopicRequest):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    response = create_topic_usecase(db, subject_id, topic_request)
+    response = create_topic_usecase(db, topic_request)
 
     return response
 
@@ -35,12 +35,12 @@ async def retrieve_all_topics(user: user_dependency, db: db_dependency, subject_
 
     return response
 
-@router.put("/{subject_id}")
-async def update_topic(user: user_dependency, db: db_dependency, topic_request: TopicRequest, subject_id: str, topic_id: str = Query(...)):
+@router.put("")
+async def update_topic(user: user_dependency, db: db_dependency, topic_request: TopicRequest):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    response = update_topic_usecase(db, subject_id, topic_request, topic_id)
+    response = update_topic_usecase(db, topic_request)
     
     return response
 
@@ -53,9 +53,9 @@ async def retrieve_topic(user: user_dependency, db: db_dependency, subject_id: s
 
     return response
 
-@router.delete("/{subject_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_topic(user: user_dependency, db: db_dependency, subject_id: str, topic_id: str = Query(...)):
+@router.delete("/{topic_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_topic(user: user_dependency, db: db_dependency, topic_id: str):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
-    delete_topic_usecase(db, subject_id, topic_id)
+    delete_topic_usecase(db, topic_id)

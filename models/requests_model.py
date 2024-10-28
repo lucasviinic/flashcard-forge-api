@@ -3,6 +3,8 @@ from pydantic import BaseModel, Field, validator
 
 
 class TopicRequest(BaseModel):
+    id: Optional[str] = Field(None)
+    subject_id: str = Field(None)
     topic_name: str = Field(min_length=3, max_length=30)
 
 class SubjectRequest(BaseModel):
