@@ -29,7 +29,7 @@ async def generate_flashcards(file: UploadFile, quantity: int = Query(5, ge=1, l
 
     return {"flashcards": flashcards_list}
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_flashcards(db: db_dependency, user: user_dependency, flashcard_request: FlashcardRequest):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
@@ -42,14 +42,20 @@ async def create_flashcards(db: db_dependency, user: user_dependency, flashcard_
 
     return response
 
-@router.get("/")
-async def retrieve_all_flashcards(user: user_dependency, db: db_dependency, topic_id: str = Query(...), page: int = Query(1, ge=1), limit: int = Query(30, gt=0, le=30)):
+@router.get("")
+async def retrieve_all_flashcards(
+    user: user_dependency,
+    db: db_dependency,
+    topic_id: str = Query(...),
+    limit: int = Query(default=15, ge=1),
+    offset: int = Query(default=0, ge=0)
+):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
     try:
         response = retrieve_all_flashcards_usecase(
-            db, topic_id=topic_id, user_id=user.get('id'), page=page, limit=limit)
+            db, topic_id=topic_id, user_id=user.get('id'), limit=limit, offset=offset)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error listing flashcards: {str(e)}")
 
@@ -67,7 +73,7 @@ async def delete_flashcard(user: user_dependency, db: db_dependency, flashcard_i
 
     return None
 
-@router.put("/{flashcard_id}")
+@router.put("/{flashcard_id}", status_code=status.HTTP_200_OK)
 async def update_flashcard(user: user_dependency, db: db_dependency, flashcard_request: FlashcardRequest, flashcard_id: str):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')

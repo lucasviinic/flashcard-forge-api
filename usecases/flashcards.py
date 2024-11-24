@@ -36,26 +36,16 @@ def create_flashcard_usecase(db: db_dependency, flashcard_request: FlashcardRequ
 
     return result
 
-def retrieve_all_flashcards_usecase(db: db_dependency, topic_id: str, user_id: str, page: int = 1, limit: int = 10) -> Dict[str, any]:
-    offset = (page - 1) * limit
-
+def retrieve_all_flashcards_usecase(db: db_dependency, topic_id: str, user_id: str, limit: int = 20, offset: int = 0) -> List[dict]:
     flashcards_query = db.query(Flashcards).filter(
         Flashcards.topic_id == topic_id,
         Flashcards.user_id == user_id,
         Flashcards.deleted_at == None
     )
 
-    total_flashcards = flashcards_query.count()
     flashcards = flashcards_query.offset(offset).limit(limit).all()
-
-    result = {
-        'total': total_flashcards,
-        'page': page,
-        'limit': limit,
-        'flashcards': flashcards
-    }
     
-    return result
+    return flashcards
 
 def delete_flashcard_usecase(db: db_dependency, user_id: str, flashcard_id: int) -> None:
     flashcard_model = db.query(Flashcards).filter(
