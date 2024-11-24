@@ -61,7 +61,7 @@ def delete_flashcard_usecase(db: db_dependency, user_id: str, flashcard_id: int)
     db.add(flashcard_model)
     db.commit()
 
-def update_flashcard_usecase(db: db_dependency, user_id: str, flashcard_id: int, flashcard_request: FlashcardRequest) -> None:
+def update_flashcard_usecase(db: db_dependency, user_id: str, flashcard_id: int, flashcard_request: FlashcardRequest) -> dict:
     flashcard_model = db.query(Flashcards).filter(
         Flashcards.id == flashcard_id,
         Flashcards.user_id == user_id,

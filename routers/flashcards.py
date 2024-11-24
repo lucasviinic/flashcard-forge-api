@@ -79,7 +79,8 @@ async def update_flashcard(user: user_dependency, db: db_dependency, flashcard_r
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
 
     try:
-        update_flashcard_usecase(db, user.get('id'), flashcard_id, flashcard_request)
+        updated_flashcard = update_flashcard_usecase(db, user.get('id'), flashcard_id, flashcard_request)
+        return updated_flashcard
     except HTTPException as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error updating flashcard: {str(e.detail)}")
 
