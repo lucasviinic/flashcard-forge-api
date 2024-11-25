@@ -7,6 +7,7 @@ class Sessions(Base):
     __tablename__ = 'sessions'
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4, comment="Unique identifier")
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     subject_id = Column(String, nullable=False, comment="Subject ID")
     topic_id = Column(UUID(as_uuid=True), ForeignKey("topics.id"), comment="Reference to topic record ID")
     topic_name = Column(String, nullable=False, comment="Topic name")

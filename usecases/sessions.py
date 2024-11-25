@@ -23,7 +23,7 @@ def create_session_usecase(db: db_dependency, session_request: SessionFlashcardR
 
     return session_data
 
-def retrieve_sessions_usecase(db: db_dependency, topic_id: int, limit: int = 10, offset: int = 0) -> List[dict]:
+def retrieve_sessions_usecase(db: db_dependency, limit: int, offset: int) -> List[dict]:
     sessions = db.query(Sessions).filter(Sessions.topic_id == topic_id).offset(offset).limit(limit).all()
     session_list = []
 

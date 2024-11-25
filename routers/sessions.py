@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from starlette import status
 
 from database import db_dependency
@@ -27,12 +27,18 @@ async def create_session(db: db_dependency, user: user_dependency, session_reque
     
     return response
 
-@router.get("/{topic_id}", status_code=status.HTTP_200_OK)
-async def retrieve_all_sessions(db: db_dependency, user: user_dependency, topic_id: int = Path(gt=0), limit: int = 10, offset: int = 0):
+@router.get("", status_code=status.HTTP_200_OK)
+async def retrieve_all_sessions(
+    db: db_dependency, 
+    user: user_dependency,
+    limit: int = Query(default=20, ge=1),
+    offset: int = Query(default=0, ge=0),
+    search: str = Query(default=None)
+):
     try:
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
-        sessions_list = retrieve_sessions_usecase(db, topic_id, limit, offset)
+        sessions_list = retrieve_sessions_usecase(db, limit, offset, search)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"error getting sessions: {str(e)}")
     
