@@ -1,5 +1,7 @@
+from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, Field, validator
+from sqlalchemy import DateTime
 
 
 class TopicRequest(BaseModel):
@@ -16,16 +18,20 @@ class FlashcardRequest(BaseModel):
     difficulty: int
 
 class SessionRequest(BaseModel):
+    subject_id: str
     topic_id: str
-    score: str
-    time: str
-    easy: int
-    medium: int
-    hard: int
+    topic_name: str
+    correct_answer_count: int
+    incorrect_answer_count: int
+    total_questions: int
+    total_time_spent: str
+    easy_question_count: int
+    medium_question_count: int
+    hard_question_count: int
 
 class SessionFlashcardRequest(BaseModel):
     session: SessionRequest
-    flashcards: List[FlashcardRequest]
+    flashcards: Optional[List[FlashcardRequest]]
 
 class FlashcardRequest(BaseModel):
     subject_id: str

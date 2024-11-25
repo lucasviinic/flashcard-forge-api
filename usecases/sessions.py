@@ -7,19 +7,19 @@ from database import db_dependency
 
 
 def create_session_usecase(db: db_dependency, session_request: SessionFlashcardRequest) -> dict:
-    session_model = Sessions(**session_request.session.model_dump())
+    session_model = Sessions(**session_request.model_dump())
     db.add(session_model)
     db.commit()
     
-    session_flashcards_models = []
-    for flashcard in session_request.flashcards:
-        session_flashcard = SessionFlashcards(**flashcard.model_dump(), session_id=session_model.id)
-        session_flashcards_models.append(session_flashcard)
-        db.add(session_flashcard)
-    db.commit()
+    # session_flashcards_models = []
+    # for flashcard in session_request.flashcards:
+    #     session_flashcard = SessionFlashcards(**flashcard.model_dump(), session_id=session_model.id)
+    #     session_flashcards_models.append(session_flashcard)
+    #     db.add(session_flashcard)
+    # db.commit()
 
     session_data = session_model.to_dict()
-    session_data["flashcards"] = [flashcard.to_dict() for flashcard in session_flashcards_models]
+    # session_data["flashcards"] = [flashcard.to_dict() for flashcard in session_flashcards_models]
 
     return session_data
 

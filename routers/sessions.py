@@ -4,7 +4,7 @@ from starlette import status
 
 from database import db_dependency
 
-from models.requests_model import SessionFlashcardRequest
+from models.requests_model import SessionFlashcardRequest, SessionRequest
 from usecases.auth import get_current_user_usecase
 from usecases.sessions import create_session_usecase, retrieve_sessions_usecase
 
@@ -16,16 +16,16 @@ router = APIRouter(
 
 user_dependency = Annotated[dict, Depends(get_current_user_usecase)]
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_session(db: db_dependency, user: user_dependency, session_request: SessionFlashcardRequest):
+@router.post("", status_code=status.HTTP_201_CREATED)
+async def create_session(db: db_dependency, user: user_dependency, session_request: SessionRequest):
     try:
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
-        session_data = create_session_usecase(db, session_request)
+        response = create_session_usecase(db, session_request)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"error creating database session: {str(e)}")
     
-    return {"session": session_data}
+    return response
 
 @router.get("/{topic_id}", status_code=status.HTTP_200_OK)
 async def retrieve_all_sessions(db: db_dependency, user: user_dependency, topic_id: int = Path(gt=0), limit: int = 10, offset: int = 0):
