@@ -21,7 +21,7 @@ async def create_session(db: db_dependency, user: user_dependency, session_reque
     try:
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
-        response = create_session_usecase(db, session_request)
+        response = create_session_usecase(db, session_request, user_id=user.get('id'))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"error creating database session: {str(e)}")
     
@@ -38,7 +38,7 @@ async def retrieve_all_sessions(
     try:
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
-        sessions_list = retrieve_sessions_usecase(db, limit, offset, search)
+        sessions_list = retrieve_sessions_usecase(db, user_id=user.get('id'), limit=limit, offset=offset, search=search)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"error getting sessions: {str(e)}")
     

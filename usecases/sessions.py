@@ -6,8 +6,8 @@ from models.session_model import Sessions
 from database import db_dependency
 
 
-def create_session_usecase(db: db_dependency, session_request: SessionFlashcardRequest) -> dict:
-    session_model = Sessions(**session_request.model_dump())
+def create_session_usecase(db: db_dependency, session_request: SessionFlashcardRequest,  user_id: str) -> dict:
+    session_model = Sessions(**session_request.model_dump(), user_id=user_id)
     db.add(session_model)
     db.commit()
     
@@ -19,18 +19,16 @@ def create_session_usecase(db: db_dependency, session_request: SessionFlashcardR
     # db.commit()
 
     session_data = session_model.to_dict()
-    # session_data["flashcards"] = [flashcard.to_dict() for flashcard in session_flashcards_models]
 
     return session_data
 
-def retrieve_sessions_usecase(db: db_dependency, limit: int, offset: int) -> List[dict]:
-    sessions = db.query(Sessions).filter(Sessions.topic_id == topic_id).offset(offset).limit(limit).all()
-    session_list = []
+def retrieve_sessions_usecase(db: db_dependency, user_id: str, limit: int, offset: int, search: str) -> List[dict]:
+    query = db.query(Sessions).filter(Sessions.user_id == user_id).filter(Sessions.deleted_at == None)
+    
+    if search:
+        query = query.filter(Sessions.topic_namep.ilike(f"%{search}%"))
 
-    for session in sessions:
-        session_data = session.to_dict()
-        session_flashcards = db.query(SessionFlashcards).filter(SessionFlashcards.session_id == session.id).all()
-        session_data["flashcards"] = [flashcard.to_dict() for flashcard in session_flashcards]
-        session_list.append(session_data)
+    sessions = query.offset(offset).limit(limit).all()
+    result = [session.to_dict() for session in sessions]
 
-    return session_list
+    return result
