@@ -34,7 +34,10 @@ async def middleware(request: Request, call_next):
             content={"detail": "Token de autenticação não fornecido."}
         )
 
-    return await call_next(request)
+    response = await call_next(request)
+    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+
+    return response
 
 database.Base.metadata.create_all(bind=engine)
 
