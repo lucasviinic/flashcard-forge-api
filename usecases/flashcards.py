@@ -96,6 +96,7 @@ def update_flashcard_usecase(db: db_dependency, user_id: str, flashcard_id: int,
     flashcard_model.question = flashcard_request.question
     flashcard_model.answer = flashcard_request.answer
     flashcard_model.difficulty = flashcard_request.difficulty
+    flashcard_model.opened = flashcard_request.opened
     flashcard_model.updated_at = datetime.now(timezone.utc)
 
     db.add(flashcard_model)
