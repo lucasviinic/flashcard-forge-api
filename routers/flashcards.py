@@ -24,7 +24,7 @@ async def generate_flashcards(
         db: db_dependency, 
         user: user_dependency, 
         file: UploadFile,
-        quantity: int = Query(5, ge=1, le=10), 
+        quantity: int = Query(5, ge=1, le=30), 
         difficulty: int = Query(1, ge=0, le=2),
         subject_id: str = Query(..., description="ID da disciplina"), 
         topic_id: str = Query(..., description="ID do tópico")):
