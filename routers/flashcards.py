@@ -20,9 +20,14 @@ router = APIRouter(
 user_dependency = Annotated[dict, Depends(get_current_user_usecase)]
 
 @router.post("/generate", status_code=status.HTTP_201_CREATED)
-async def generate_flashcards(db: db_dependency, user: user_dependency, file: UploadFile,
-        quantity: int = Query(5, ge=1, le=10), difficulty: int = Query(1, ge=0, le=2),
-        subject_id: str = Query(..., description="ID da disciplina"), topic_id: str = Query(..., description="ID do tópico")):
+async def generate_flashcards(
+        db: db_dependency, 
+        user: user_dependency, 
+        file: UploadFile,
+        quantity: int = Query(5, ge=1, le=10), 
+        difficulty: int = Query(1, ge=0, le=2),
+        subject_id: str = Query(..., description="ID da disciplina"), 
+        topic_id: str = Query(..., description="ID do tópico")):
     try:
         text_content = pdf_to_text(pdf=file.file)
         flashcards_list = generate_flashcards_usecase(

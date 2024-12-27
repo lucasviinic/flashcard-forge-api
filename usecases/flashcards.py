@@ -14,13 +14,13 @@ from utils.utils import fragment_text
 
 def generate_flashcards_usecase(db: db_dependency, content: str, quantity: int, user_id: str, subject_id: str,
         topic_id: str, difficulty: int = 1) -> List[dict]:
+
     generated_flashcards = []
     text_fragments = fragment_text(content)
 
     for fragment in text_fragments:
         flashcards_list = openai_client.flash_card_generator(prompt=fragment,\
-            history=generated_flashcards, quantity=quantity, difficulty=difficulty,\
-            subject_id=subject_id, topic_id=topic_id)
+            history=generated_flashcards, quantity=quantity, difficulty=difficulty)
         generated_flashcards.extend(flashcards_list)
 
     result = []
