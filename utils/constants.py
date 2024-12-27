@@ -2,7 +2,8 @@ FLASHCARDS_RESPONSE_TEMPLATE = {
   "flashcards": [
         {
             "question": "conteúdo da pergunta contendo no máximo 100 caracteres",
-            "answer": "conteúdo da respostas contendo no máximo 100 caracteres"
+            "answer": "conteúdo da respostas contendo no máximo 100 caracteres",
+            "opened": False
         }
   ]
 }

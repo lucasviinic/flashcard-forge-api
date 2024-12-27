@@ -12,16 +12,38 @@ from database import db_dependency
 from utils.utils import fragment_text
 
 
-def generate_flashcards_usecase(content: str, quantity: int, difficulty: int = 1) -> List[dict]:
+def generate_flashcards_usecase(db: db_dependency, content: str, quantity: int, user_id: str, subject_id: str,
+        topic_id: str, difficulty: int = 1) -> List[dict]:
     generated_flashcards = []
     text_fragments = fragment_text(content)
 
     for fragment in text_fragments:
         flashcards_list = openai_client.flash_card_generator(prompt=fragment,\
-            history=generated_flashcards, quantity=quantity, difficulty=difficulty)
+            history=generated_flashcards, quantity=quantity, difficulty=difficulty,\
+            subject_id=subject_id, topic_id=topic_id)
         generated_flashcards.extend(flashcards_list)
+
+    result = []
+
+    for flashcard in generated_flashcards:
+        flashcard_model = Flashcards()
+
+        flashcard_model.question = flashcard.get('question')
+        flashcard_model.answer = flashcard.get('answer')
+
+        flashcard_model.user_id = user_id
+        flashcard_model.subject_id = subject_id
+        flashcard_model.topic_id = topic_id
+        flashcard_model.difficulty = difficulty
+        flashcard_model.opened = False
+
+        db.add(flashcard_model)
+        db.commit()
+        db.refresh(flashcard_model)
+
+        result.append(flashcard_model.to_dict())
         
-    return generated_flashcards
+    return result
         
         
 def create_flashcard_usecase(db: db_dependency, flashcard_request: FlashcardRequest, user_id: str) -> dict:
