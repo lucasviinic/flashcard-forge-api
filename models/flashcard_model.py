@@ -14,6 +14,7 @@ class Flashcards(Base):
     answer = Column(String, nullable=False)
     difficulty = Column(Integer, nullable=False)
     last_response = Column(Boolean, default=None)
+    opened = Column(Boolean, default=True)
     image_url = Column(String)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime)
