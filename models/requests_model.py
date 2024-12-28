@@ -50,3 +50,6 @@ class FlashcardRequest(BaseModel):
 
 class FlashcardsListRequest(BaseModel):
     data: List[FlashcardRequest]
+
+class FeedbackRequest(BaseModel):
+    feedback: str = Field(min_length=5, max_length=300)
