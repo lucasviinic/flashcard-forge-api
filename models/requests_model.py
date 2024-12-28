@@ -39,7 +39,7 @@ class FlashcardRequest(BaseModel):
     question: str
     answer: str
     difficulty: int
-    opened: bool
+    opened: Optional[bool] = None
     image_url: Optional[str] = None
 
     @validator('difficulty')

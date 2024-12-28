@@ -26,7 +26,7 @@ def retrieve_sessions_usecase(db: db_dependency, user_id: str, limit: int, offse
     query = db.query(Sessions).filter(Sessions.user_id == user_id).filter(Sessions.deleted_at == None)
     
     if search:
-        query = query.filter(Sessions.topic_namep.ilike(f"%{search}%"))
+        query = query.filter(Sessions.topic_name.ilike(f"%{search}%"))
 
     sessions = query.offset(offset).limit(limit).all()
     result = [session.to_dict() for session in sessions]
