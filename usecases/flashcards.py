@@ -1,13 +1,11 @@
 from datetime import datetime, timezone
-import os
-from typing import Dict, List, Optional
+from typing import List, Optional, Tuple
 
 from fastapi import HTTPException
 from sqlalchemy import func
 
 from models.flashcard_model import Flashcards
-from models.requests_model import FlashcardRequest, FlashcardsListRequest
-from utils import token_counter
+from models.requests_model import FlashcardRequest
 from core.openai import client as openai_client
 from database import db_dependency
 from utils.utils import fragment_text
@@ -65,13 +63,15 @@ def retrieve_all_flashcards_usecase(
         user_id: str,
         limit: Optional[int] = 20,
         offset: Optional[int] = 0
-    ) -> List[dict]:
+    ) -> Tuple[List[dict], int]:
     
     query = db.query(Flashcards).filter(
         Flashcards.topic_id == topic_id,
         Flashcards.user_id == user_id,
         Flashcards.deleted_at.is_(None)
     )
+
+    total_count = query.count()
 
     if limit is None and offset is None:
         query = query.order_by(func.random())
@@ -82,7 +82,7 @@ def retrieve_all_flashcards_usecase(
             query = query.offset(offset)
     
     flashcards = query.all()
-    return [flashcard.to_dict() for flashcard in flashcards]
+    return [flashcard.to_dict() for flashcard in flashcards], total_count
 
 def delete_flashcard_usecase(db: db_dependency, user_id: str, flashcard_id: int) -> None:
     flashcard_model = db.query(Flashcards).filter(

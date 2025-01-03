@@ -70,11 +70,12 @@ async def retrieve_all_flashcards(
     
     try:
         if limit == 0:
-            response = retrieve_all_flashcards_usecase(
+            result, count = retrieve_all_flashcards_usecase(
                 db, topic_id=topic_id, user_id=user.get('id'), limit=None, offset=None)
         else:
-            response = retrieve_all_flashcards_usecase(
+            result, count = retrieve_all_flashcards_usecase(
                 db, topic_id=topic_id, user_id=user.get('id'), limit=limit, offset=offset)
+        response = {"flashcards": result, "count": count}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error listing flashcards: {str(e)}")
 
