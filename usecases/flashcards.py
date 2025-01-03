@@ -1,8 +1,9 @@
 from datetime import datetime, timezone
 import os
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from fastapi import HTTPException
+from sqlalchemy import func
 
 from models.flashcard_model import Flashcards
 from models.requests_model import FlashcardRequest, FlashcardsListRequest
@@ -58,16 +59,30 @@ def create_flashcard_usecase(db: db_dependency, flashcard_request: FlashcardRequ
 
     return result
 
-def retrieve_all_flashcards_usecase(db: db_dependency, topic_id: str, user_id: str, limit: int = 20, offset: int = 0) -> List[dict]:
-    flashcards_query = db.query(Flashcards).filter(
+def retrieve_all_flashcards_usecase(
+        db: db_dependency,
+        topic_id: str,
+        user_id: str,
+        limit: Optional[int] = 20,
+        offset: Optional[int] = 0
+    ) -> List[dict]:
+    
+    query = db.query(Flashcards).filter(
         Flashcards.topic_id == topic_id,
         Flashcards.user_id == user_id,
-        Flashcards.deleted_at == None
+        Flashcards.deleted_at.is_(None)
     )
 
-    flashcards = flashcards_query.offset(offset).limit(limit).all()
+    if limit is None and offset is None:
+        query = query.order_by(func.random())
+    else:
+        if limit is not None:
+            query = query.limit(limit)
+        if offset is not None:
+            query = query.offset(offset)
     
-    return flashcards
+    flashcards = query.all()
+    return [flashcard.to_dict() for flashcard in flashcards]
 
 def delete_flashcard_usecase(db: db_dependency, user_id: str, flashcard_id: int) -> None:
     flashcard_model = db.query(Flashcards).filter(

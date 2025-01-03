@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 from starlette import status
 from models.flashcard_model import Flashcards
 from models.requests_model import FlashcardRequest, FlashcardsListRequest
@@ -62,15 +62,19 @@ async def retrieve_all_flashcards(
     user: user_dependency,
     db: db_dependency,
     topic_id: str = Query(...),
-    limit: int = Query(default=15, ge=1),
+    limit: Optional[int] = Query(default=15, ge=0),
     offset: int = Query(default=0, ge=0)
 ):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
     try:
-        response = retrieve_all_flashcards_usecase(
-            db, topic_id=topic_id, user_id=user.get('id'), limit=limit, offset=offset)
+        if limit == 0:
+            response = retrieve_all_flashcards_usecase(
+                db, topic_id=topic_id, user_id=user.get('id'), limit=None, offset=None)
+        else:
+            response = retrieve_all_flashcards_usecase(
+                db, topic_id=topic_id, user_id=user.get('id'), limit=limit, offset=offset)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error listing flashcards: {str(e)}")
 
