@@ -10,6 +10,7 @@ class TopicRequest(BaseModel):
     topic_name: str = Field(min_length=3, max_length=30)
 
 class SubjectRequest(BaseModel):
+    image_url: Optional[str] = None
     subject_name: str = Field(min_length=3, max_length=30)
 
 class FlashcardRequest(BaseModel):

@@ -54,6 +54,7 @@ def update_subject_usecase(db: db_dependency, subject_request: SubjectRequest, s
         raise HTTPException(status_code=404, detail='subject not found')
     
     subject_model.subject_name = subject_request.subject_name
+    subject_model.image_url = subject_request.image_url
     subject_model.updated_at = datetime.now(timezone.utc)
 
     db.add(subject_model)
