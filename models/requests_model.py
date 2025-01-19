@@ -7,11 +7,11 @@ from sqlalchemy import DateTime
 class TopicRequest(BaseModel):
     id: Optional[str] = Field(None)
     subject_id: str = Field(None)
-    topic_name: str = Field(min_length=3, max_length=30)
+    topic_name: str = Field(max_length=30)
 
 class SubjectRequest(BaseModel):
     image_url: Optional[str] = None
-    subject_name: str = Field(min_length=3, max_length=30)
+    subject_name: str = Field(max_length=30)
 
 class FlashcardRequest(BaseModel):
     flashcard_id: int

@@ -82,7 +82,9 @@ def retrieve_all_flashcards_usecase(
             query = query.offset(offset)
     
     flashcards = query.all()
-    return [flashcard.to_dict() for flashcard in flashcards], total_count
+    result = [flashcard.to_dict() for flashcard in flashcards], total_count
+
+    return result
 
 def delete_flashcard_usecase(db: db_dependency, user_id: str, flashcard_id: int) -> None:
     flashcard_model = db.query(Flashcards).filter(
@@ -112,6 +114,7 @@ def update_flashcard_usecase(db: db_dependency, user_id: str, flashcard_id: int,
     flashcard_model.answer = flashcard_request.answer
     flashcard_model.difficulty = flashcard_request.difficulty
     flashcard_model.opened = flashcard_request.opened
+    flashcard_model.image_url = flashcard_request.image_url
     flashcard_model.updated_at = datetime.now(timezone.utc)
 
     db.add(flashcard_model)

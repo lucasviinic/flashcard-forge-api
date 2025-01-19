@@ -21,6 +21,7 @@ def flash_card_generator(prompt: str, history: list, quantity: int, difficulty: 
             model = os.getenv('DEFAULT_MODEL')
             system_prompt = f"""
             ## Você é um gerador de flashcards e apenas um gerador de flashcards. Com base em todo texto que receber, você deve apenas gerar {quantity} ótimos flashcards de grau {difficulty_levels[difficulty]} sobre o conteúdo do texto, não faça perguntas triviais, apenas perguntas de nível abordado em provas. Você deve gerar apenas perguntas e respostas contendo o que pode ser encontrado no texto fornecido. Você é um gerador de flashcards e deve gerar apenas flashcards.
+            ## Você SEMPRe deve gerar {quantity} fleshcards. Gere exatamente {quantity} flashcards. Não gere nem mais nem menos do que {quantity}, gere exatamente {quantity} flashcards.
             ## Você deve entregar o resultado no formato JSON. Você SEMPRE deve retornar o resultado no formato JSON, contendo uma lista de flashcards no seguinte formato:
             {json.dumps(constants.FLASHCARDS_RESPONSE_TEMPLATE)}
             ## Histórico de flashcards gerados (caso haja conteúdo abaixo, não repita)
