@@ -16,6 +16,7 @@ class Flashcards(Base):
     last_response = Column(Boolean, default=None)
     opened = Column(Boolean, default=True)
     image_url = Column(String)
+    origin = Column(String, nullable=False, default="user")
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime)
     deleted_at = Column(DateTime)
