@@ -21,12 +21,11 @@ def retrieve_user_usecase(db: db_dependency, user_id: str) -> dict:
     flashcards_count = db.query(Flashcards).filter(Flashcards.user_id == user_id).count()
     flashcards_usage = f"{flashcards_count}/{flashcard_limit}"
 
-    ai_gen_flashcards_limit = os.getenv('DEFAULT_AI_GEN_FLASHCARDS_LIMIT')
     ai_gen_flashcards_count = db.query(Flashcards).filter(
         Flashcards.user_id == user_id,
         Flashcards.origin == 'ai'
     ).count()
-    ai_gen_flashcards_usage = f"{ai_gen_flashcards_count}/{ai_gen_flashcards_limit}"
+    ai_gen_flashcards_usage = f"{ai_gen_flashcards_count}/{os.getenv('DEFAULT_AI_GEN_FLASHCARDS_LIMIT')}"
 
     subjects_limit = os.getenv('DEFAULT_SUBJECTS_LIMIT')
     subjects_count = db.query(Subjects).filter(Subjects.user_id == user_id).count()
@@ -34,7 +33,7 @@ def retrieve_user_usecase(db: db_dependency, user_id: str) -> dict:
 
     if user_model.account_type == 1:
         flashcards_usage = None
-        ai_gen_flashcards_usage = f"{ai_gen_flashcards_usage}/{os.getenv('PREMIUM_AI_GEN_FLASHCARDS_LIMIT')}"
+        ai_gen_flashcards_usage = f"{ai_gen_flashcards_count}/{os.getenv('PREMIUM_AI_GEN_FLASHCARDS_LIMIT')}"
         subjects_usage = None
 
     user_data = user_model.to_dict()
