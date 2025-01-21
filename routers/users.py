@@ -23,7 +23,7 @@ async def retrieve_user(user: user_dependency, db: db_dependency):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
 
     try:
-        user_data = retrieve_user_usecase(db=db_dependency, user_id=user.get('id'))
+        user_data = retrieve_user_usecase(db, user_id=user.get('id'))
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"error getting user: {str(e)}")
 

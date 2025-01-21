@@ -33,16 +33,15 @@ def retrieve_user_usecase(db: db_dependency, user_id: str) -> dict:
     subjects_usage = f"{subjects_count}/{subjects_limit}"
 
     if user_model.account_type == 1:
-        flashcards_usage = "Unlimited"
+        flashcards_usage = None
         ai_gen_flashcards_usage = f"{ai_gen_flashcards_usage}/{os.getenv('PREMIUM_AI_GEN_FLASHCARDS_LIMIT')}"
-        subjects_usage = "Unlimited"
+        subjects_usage = None
 
     user_data = user_model.to_dict()
 
     user_data['flashcards_usage'] = flashcards_usage
     user_data['ai_gen_flashcards_usage'] = ai_gen_flashcards_usage
     user_data['subjects_usage'] = subjects_usage
-    user_data['created_at'] = user_model.created_at.strftime('%B %d, %Y')
 
     return user_data
     
