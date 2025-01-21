@@ -21,5 +21,9 @@ class Flashcards(Base):
     updated_at = Column(DateTime)
     deleted_at = Column(DateTime)
 
+    __table_args__ = (
+        CheckConstraint("origin IN ('user', 'ai')", name='check_origin_valid_values'),
+    )
+
     def to_dict(self):
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}

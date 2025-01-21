@@ -49,13 +49,6 @@ async def signin(google_signin_request: GoogleSignInRequest, db: db_dependency):
 
     user_info = response.json()
 
-    # user_info = {
-    #     "id": "114240668760528054065",
-    #     "email": "lucasviniciuss529@gmail.com",
-    #     "name": "Lucas Vinícius",
-    #     "picture": "https://lh3.googleusercontent.com/a/ACg8ocIdCdv7VDIv5YEseXtHKe3LMgBwwXHpaV3w5S7F-iYB8sozsWPXOw=s96-c"
-    # }
-
     google_id = user_info.get('id')
     email = user_info.get('email')
     name = user_info.get('name', '')
