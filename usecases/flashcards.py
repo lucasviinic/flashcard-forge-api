@@ -35,6 +35,7 @@ def generate_flashcards_usecase(db: db_dependency, content: str, quantity: int, 
         flashcard_model.topic_id = topic_id
         flashcard_model.difficulty = difficulty
         flashcard_model.opened = False
+        flashcard_model.origin = 'ai'
 
         db.add(flashcard_model)
         db.commit()
