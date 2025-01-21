@@ -4,6 +4,7 @@ from fastapi import HTTPException
 
 from database import db_dependency
 from models.flashcard_model import Flashcards
+from models.requests_model import UserRequest
 from models.subject_model import Subjects
 from models.topic_model import Topics
 from models.user_model import Users
@@ -44,3 +45,19 @@ def retrieve_user_usecase(db: db_dependency, user_id: str) -> dict:
 
     return user_data
     
+def update_user_usecase(db: db_dependency, user_id: str, user_request: UserRequest) -> dict:
+    user_model = db.query(Users).filter(
+        Users.id == user_id,
+        Users.deleted_at.is_(None)
+    ).first()
+
+    if not user_model:
+        raise HTTPException(status_code=404, detail='user not found')
+
+    user_model.picture = user_request.picture
+
+    db.add(user_model)
+    db.commit()
+
+    result = user_model.to_dict()
+    return result

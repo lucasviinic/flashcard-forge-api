@@ -54,3 +54,6 @@ class FlashcardsListRequest(BaseModel):
 
 class FeedbackRequest(BaseModel):
     feedback: str = Field(min_length=5, max_length=300)
+
+class UserRequest(BaseModel):
+    picture: Optional[str] = None
