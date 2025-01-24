@@ -6,6 +6,8 @@ from database import db_dependency
 from models.requests_model import SubjectRequest
 from models.subject_model import Subjects
 from models.topic_model import Topics
+from models.user_model import Users
+from utils.constants import USER_LIMITS
 
 
 def retrieve_all_subjects_usecase(db: db_dependency, user_id: str, limit: int, offset: int, search: str) -> List[dict]:
@@ -36,6 +38,16 @@ def retrieve_all_subjects_usecase(db: db_dependency, user_id: str, limit: int, o
     return result
 
 def create_subject_usecase(db: db_dependency, subject_request: SubjectRequest, user_id: str) -> dict:
+    total_subjects = db.query(Subjects).filter(
+        Subjects.user_id == user_id,
+        Subjects.deleted_at.is_(None)
+    ).count()
+
+    user = db.query(Users).filter(Users.id == user_id, Users.deleted_at.is_(None)).first()
+
+    if total_subjects >= USER_LIMITS[user.account_type]["subjects_limit"]:
+        raise HTTPException(status_code=400, detail='Subject limit reached')
+
     subject_model = Subjects(**subject_request.model_dump(), user_id=user_id)
 
     db.add(subject_model)

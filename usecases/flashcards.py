@@ -8,12 +8,38 @@ from models.flashcard_model import Flashcards
 from models.requests_model import FlashcardRequest
 from core.openai import client as openai_client
 from database import db_dependency
+from models.user_model import Users
+from utils.constants import USER_LIMITS
 from utils.utils import fragment_text
 
 
 def generate_flashcards_usecase(db: db_dependency, content: str, quantity: int, user_id: str, subject_id: str,
         topic_id: str, difficulty: int = 1) -> List[dict]:
+    
+    total_flashcards = db.query(Flashcards).filter(
+        Flashcards.user_id == user_id,
+        Flashcards.deleted_at.is_(None)
+    ).count()
 
+    total_generated = db.query(Flashcards).filter(
+        Flashcards.user_id == user_id,
+        Flashcards.origin == "ai"
+    ).count()
+
+    user = db.query(Users).filter(Users.id == user_id, Users.deleted_at.is_(None)).first()
+    user_limit = USER_LIMITS[user.account_type]["flashcards_limit"]
+    generated_limit = USER_LIMITS[user.account_type]["ai_gen_flashcards_limit"]
+
+    flashcards_remaining = user_limit - total_flashcards
+    generated_remaining = generated_limit - total_generated
+
+    if flashcards_remaining <= 0:
+        raise HTTPException(status_code=400, detail='Flashcard limit reached')
+    if generated_remaining <= 0:
+        raise HTTPException(status_code=400, detail='AI generated flashcards limit reached')
+    
+    quantity = quantity if quantity <= generated_remaining else generated_remaining
+    
     generated_flashcards = []
     text_fragments = fragment_text(content)
 
@@ -34,7 +60,7 @@ def generate_flashcards_usecase(db: db_dependency, content: str, quantity: int, 
         flashcard_model.subject_id = subject_id
         flashcard_model.topic_id = topic_id
         flashcard_model.difficulty = difficulty
-        flashcard_model.opened = False
+        flashcard_model.opened = True
         flashcard_model.origin = 'ai'
 
         db.add(flashcard_model)
@@ -47,6 +73,16 @@ def generate_flashcards_usecase(db: db_dependency, content: str, quantity: int, 
         
         
 def create_flashcard_usecase(db: db_dependency, flashcard_request: FlashcardRequest, user_id: str) -> dict:
+    total_flashcards = db.query(Flashcards).filter(
+        Flashcards.user_id == user_id,
+        Flashcards.deleted_at.is_(None)
+    ).count()
+
+    user = db.query(Users).filter(Users.id == user_id, Users.deleted_at.is_(None)).first()
+
+    if total_flashcards >= USER_LIMITS[user.account_type]["flashcards_limit"]:
+        raise HTTPException(status_code=400, detail='Flashcard limit reached')
+
     flashcard_model = Flashcards(**flashcard_request.model_dump())
     flashcard_model.user_id = user_id
 
