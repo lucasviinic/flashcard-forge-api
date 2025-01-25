@@ -44,8 +44,9 @@ def create_subject_usecase(db: db_dependency, subject_request: SubjectRequest, u
     ).count()
 
     user = db.query(Users).filter(Users.id == user_id, Users.deleted_at.is_(None)).first()
+    subjects_limit = USER_LIMITS[user.account_type]["subjects_limit"]
 
-    if total_subjects >= USER_LIMITS[user.account_type]["subjects_limit"]:
+    if total_subjects >= subjects_limit:
         raise HTTPException(status_code=400, detail='Subject limit reached')
 
     subject_model = Subjects(**subject_request.model_dump(), user_id=user_id)

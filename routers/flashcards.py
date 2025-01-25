@@ -28,19 +28,17 @@ async def generate_flashcards(
         difficulty: int = Query(1, ge=0, le=2),
         subject_id: str = Query(..., description="ID da disciplina"), 
         topic_id: str = Query(..., description="ID do tópico")):
-    try:
-        text_content = pdf_to_text(pdf=file.file)
-        flashcards_list = generate_flashcards_usecase(
-            db,
-            content=text_content, 
-            quantity=quantity, 
-            difficulty=difficulty,
-            subject_id=subject_id,
-            topic_id=topic_id, 
-            user_id=user.get('id')
-        )
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Erro durante a conversão do PDF: {str(e)}")
+    
+    text_content = pdf_to_text(pdf=file.file)
+    flashcards_list = generate_flashcards_usecase(
+        db,
+        content=text_content, 
+        quantity=quantity, 
+        difficulty=difficulty,
+        subject_id=subject_id,
+        topic_id=topic_id, 
+        user_id=user.get('id')
+    )
 
     return {"flashcards": flashcards_list}
 

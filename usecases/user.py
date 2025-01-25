@@ -8,6 +8,7 @@ from models.requests_model import UserRequest
 from models.subject_model import Subjects
 from models.topic_model import Topics
 from models.user_model import Users
+from utils.constants import USER_LIMITS
 
 
 dotenv.load_dotenv()
@@ -18,7 +19,7 @@ def retrieve_user_usecase(db: db_dependency, user_id: str) -> dict:
     if not user_model:
         raise HTTPException(status_code=400, detail='user not found')
 
-    flashcard_limit = os.getenv('DEFAULT_FLASHCARDS_LIMIT')
+    flashcard_limit = USER_LIMITS[user_model.account_type]["flashcards_limit"]
     flashcards_count = db.query(Flashcards).filter(Flashcards.user_id == user_id).count()
     flashcards_usage = f"{flashcards_count}/{flashcard_limit}"
 
@@ -26,15 +27,15 @@ def retrieve_user_usecase(db: db_dependency, user_id: str) -> dict:
         Flashcards.user_id == user_id,
         Flashcards.origin == 'ai'
     ).count()
-    ai_gen_flashcards_usage = f"{ai_gen_flashcards_count}/{os.getenv('DEFAULT_AI_GEN_FLASHCARDS_LIMIT')}"
+    ai_gen_flashcards_limit = USER_LIMITS[user_model.account_type]["ai_gen_flashcards_limit"]
+    ai_gen_flashcards_usage = f"{ai_gen_flashcards_count}/{ai_gen_flashcards_limit}"
 
-    subjects_limit = os.getenv('DEFAULT_SUBJECTS_LIMIT')
+    subjects_limit = USER_LIMITS[user_model.account_type]["subjects_limit"]
     subjects_count = db.query(Subjects).filter(Subjects.user_id == user_id).count()
     subjects_usage = f"{subjects_count}/{subjects_limit}"
 
     if user_model.account_type == 1:
         flashcards_usage = None
-        ai_gen_flashcards_usage = f"{ai_gen_flashcards_count}/{os.getenv('PREMIUM_AI_GEN_FLASHCARDS_LIMIT')}"
         subjects_usage = None
 
     user_data = user_model.to_dict()

@@ -27,10 +27,10 @@ def generate_flashcards_usecase(db: db_dependency, content: str, quantity: int, 
     ).count()
 
     user = db.query(Users).filter(Users.id == user_id, Users.deleted_at.is_(None)).first()
-    user_limit = USER_LIMITS[user.account_type]["flashcards_limit"]
+    flashcards_limit = USER_LIMITS[user.account_type]["flashcards_limit"]
     generated_limit = USER_LIMITS[user.account_type]["ai_gen_flashcards_limit"]
 
-    flashcards_remaining = user_limit - total_flashcards
+    flashcards_remaining = flashcards_limit - total_flashcards
     generated_remaining = generated_limit - total_generated
 
     if flashcards_remaining <= 0:
