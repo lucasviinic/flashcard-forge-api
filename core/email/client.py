@@ -19,7 +19,7 @@ def send_feedback_email(user_info: Users, feedback_content: str):
     recipient_email = os.getenv('EMAIL_RECIPIENT')
 
     message = MIMEMultipart()
-    message["From"] = "FlashcardForge Feedbacks"
+    message["From"] = "Flashly Feedbacks"
     message["To"] = recipient_email
     message["Subject"] = f"Feedback de {user_info.name} (ID: {user_info.id})"
 
