@@ -108,3 +108,6 @@ api_docs/
 # Ignore pipenv virtual environment
 Pipfile
 Pipfile.lock
+
+# Firebase
+flashcardforge-firebase-adminsdk.json
