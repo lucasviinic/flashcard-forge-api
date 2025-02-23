@@ -99,7 +99,9 @@ def retrieve_all_flashcards_usecase(
         topic_id: str,
         user_id: str,
         limit: Optional[int] = 20,
-        offset: Optional[int] = 0
+        offset: Optional[int] = 0,
+        difficulties: Optional[List[int]] = None,
+        ai_generated: Optional[bool] = None
     ) -> Tuple[List[dict], int]:
     
     query = db.query(Flashcards).filter(
@@ -107,6 +109,12 @@ def retrieve_all_flashcards_usecase(
         Flashcards.user_id == user_id,
         Flashcards.deleted_at.is_(None)
     )
+
+    if difficulties:
+        query = query.filter(Flashcards.difficulty.in_(difficulties))
+    
+    if ai_generated is not None:
+        query = query.filter(Flashcards.ai_generated == ai_generated)
 
     total_count = query.count()
 
@@ -119,9 +127,10 @@ def retrieve_all_flashcards_usecase(
             query = query.offset(offset)
     
     flashcards = query.all()
-    result = [flashcard.to_dict() for flashcard in flashcards], total_count
+    result = [flashcard.to_dict() for flashcard in flashcards]
 
-    return result
+    return result, total_count
+
 
 def delete_flashcard_usecase(db: db_dependency, user_id: str, flashcard_id: int) -> None:
     flashcard_model = db.query(Flashcards).filter(

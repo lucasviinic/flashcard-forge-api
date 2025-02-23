@@ -61,18 +61,41 @@ async def retrieve_all_flashcards(
     db: db_dependency,
     topic_id: str = Query(...),
     limit: Optional[int] = Query(default=15, ge=0),
-    offset: int = Query(default=0, ge=0)
+    offset: int = Query(default=0, ge=0),
+    difficulties: Optional[str] = Query(default=None),
+    ai_generated: Optional[bool] = Query(default=None)
 ):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='authentication failed')
     
+    difficulties_list = None
+    if difficulties:
+        try:
+            difficulties_list = [int(d) for d in difficulties.split(",")]
+        except Exception:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Formato de 'difficulties' inválido")
+    
     try:
         if limit == 0:
             result, count = retrieve_all_flashcards_usecase(
-                db, topic_id=topic_id, user_id=user.get('id'), limit=None, offset=None)
+                db,
+                topic_id=topic_id,
+                user_id=user.get('id'),
+                limit=None,
+                offset=None,
+                difficulties=difficulties_list,
+                ai_generated=ai_generated
+            )
         else:
             result, count = retrieve_all_flashcards_usecase(
-                db, topic_id=topic_id, user_id=user.get('id'), limit=limit, offset=offset)
+                db,
+                topic_id=topic_id,
+                user_id=user.get('id'),
+                limit=limit,
+                offset=offset,
+                difficulties=difficulties_list,
+                ai_generated=ai_generated
+            )
         response = {"flashcards": result, "count": count}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error listing flashcards: {str(e)}")
