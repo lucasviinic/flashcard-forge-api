@@ -1,4 +1,5 @@
 import os
+import dotenv
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from database import engine
@@ -8,6 +9,8 @@ from jose import jwt, JWTError
 
 
 app = FastAPI()
+
+dotenv.load_dotenv()
 
 @app.middleware("http")
 async def middleware(request: Request, call_next):

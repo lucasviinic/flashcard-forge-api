@@ -6,9 +6,7 @@ import json
 from utils import constants
 
 
-dotenv.load_dotenv()
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-
 
 def flash_card_generator(prompt: str, history: list, quantity: int, difficulty: int = 1):
     max_attempt = 3

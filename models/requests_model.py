@@ -1,7 +1,6 @@
-from datetime import datetime
 from typing import List, Optional
+from fastapi import File, UploadFile
 from pydantic import BaseModel, Field, validator
-from sqlalchemy import DateTime
 
 
 class TopicRequest(BaseModel):
@@ -56,4 +55,4 @@ class FeedbackRequest(BaseModel):
     feedback: str = Field(min_length=5, max_length=300)
 
 class UserRequest(BaseModel):
-    picture: Optional[str] = None
+    file_picture: UploadFile = File(...)

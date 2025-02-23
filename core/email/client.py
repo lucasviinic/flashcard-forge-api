@@ -3,12 +3,9 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import dotenv
-
 from models.user_model import Users
 
 
-dotenv.load_dotenv()
 email_pass = os.getenv('EMAIL_PASS')
 
 def send_feedback_email(user_info: Users, feedback_content: str):

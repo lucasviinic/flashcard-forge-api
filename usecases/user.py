@@ -1,7 +1,9 @@
+from datetime import datetime, timezone
 import os
 import dotenv
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 
+from core.firebase.client import firebase_file_upload
 from database import db_dependency
 from models.flashcard_model import Flashcards
 from models.requests_model import UserRequest
@@ -10,8 +12,13 @@ from models.topic_model import Topics
 from models.user_model import Users
 from utils.constants import USER_LIMITS
 
+import firebase_admin
+from firebase_admin import credentials, storage
 
-dotenv.load_dotenv()
+from google.cloud.exceptions import NotFound
+
+from utils.utils import validate_file_size
+
 
 def retrieve_user_usecase(db: db_dependency, user_id: str) -> dict:
     user_model = db.query(Users).filter(Users.id == user_id, Users.deleted_at.is_(None)).first()
@@ -46,7 +53,7 @@ def retrieve_user_usecase(db: db_dependency, user_id: str) -> dict:
 
     return user_data
     
-def update_user_usecase(db: db_dependency, user_id: str, user_request: UserRequest) -> dict:
+def update_user_usecase(db: db_dependency, user_id: str, file_picture: UploadFile) -> dict:
     user_model = db.query(Users).filter(
         Users.id == user_id,
         Users.deleted_at.is_(None)
@@ -54,8 +61,18 @@ def update_user_usecase(db: db_dependency, user_id: str, user_request: UserReque
 
     if not user_model:
         raise HTTPException(status_code=404, detail='user not found')
-
-    user_model.picture = user_request.picture
+    
+    if not file_picture.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="the uploaded file is not an image")
+    
+    if validate_file_size(file_obj=file_picture.file, max_size_mb=5):
+        raise HTTPException(status_code=400, detail=f"the file exceeds the maximum allowed size of 5MB")
+    
+    user_model.picture = firebase_file_upload(
+        bucket_blob=os.getenv("FIREBASE_PROFILE_IMAGE_BLOB"),
+        file_image=file_picture,
+        image_id=user_id
+    )
 
     db.add(user_model)
     db.commit()
