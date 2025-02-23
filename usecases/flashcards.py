@@ -114,7 +114,7 @@ def retrieve_all_flashcards_usecase(
         query = query.filter(Flashcards.difficulty.in_(difficulties))
     
     if ai_generated is not None:
-        query = query.filter(Flashcards.ai_generated == ai_generated)
+        query = query.filter(Flashcards.origin == "ai")
 
     total_count = query.count()
 
