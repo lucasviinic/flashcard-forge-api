@@ -1,4 +1,5 @@
-from typing import List, Optional
+from datetime import datetime
+from typing import List, Optional, Dict
 from fastapi import File, UploadFile
 from pydantic import BaseModel, Field, validator
 
@@ -56,3 +57,11 @@ class FeedbackRequest(BaseModel):
 
 class UserRequest(BaseModel):
     file_picture: UploadFile = File(...)
+
+
+class ErrorLog(BaseModel):
+    error_message: str = Field(..., description="Error description")
+    stack_trace: str = Field(..., description="Stack trace detail")
+    screen: Optional[str] = Field(None, description="Screen when error ocurred")
+    timestamp: datetime = Field(..., description="Timestamp")
+    device_info: Optional[Dict[str, str]] = Field(None, description="Device info")

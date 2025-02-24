@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from database import engine
 import database
-from routers import flashcards, auth, subjects, topics, sessions, feedbacks, users
+from routers import flashcards, auth, logs, subjects, topics, sessions, feedbacks, users
 from jose import jwt, JWTError
 
 
@@ -36,7 +36,7 @@ async def log_exceptions(request: Request, call_next):
 
 @app.middleware("http")
 async def middleware(request: Request, call_next):
-    if request.url.path in ["/feedback", "/auth/signin", "/docs", "/openapi.json"]:
+    if request.url.path in ["/logs", "/feedback", "/auth/signin", "/docs", "/openapi.json"]:
         return await call_next(request)
     
     token = request.headers.get("Authorization")
@@ -73,3 +73,4 @@ app.include_router(topics.router)
 app.include_router(sessions.router)
 app.include_router(feedbacks.router)
 app.include_router(users.router)
+app.include_router(logs.router)
