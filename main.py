@@ -13,27 +13,6 @@ app = FastAPI()
 
 dotenv.load_dotenv()
 
-logging.basicConfig(
-    level=logging.ERROR,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
-
-@app.middleware("http")
-async def log_exceptions(request: Request, call_next):
-    try:
-        response = await call_next(request)
-        return response
-    except Exception as e:
-        logger.error(f"Erro na rota {request.url.path}: {str(e)}", exc_info=True)
-        return JSONResponse(
-            status_code=500,
-            content={"message": "Ocorreu um erro interno no servidor"}
-        )
-
 @app.middleware("http")
 async def middleware(request: Request, call_next):
     if request.url.path in ["/logs", "/feedback", "/auth/signin", "/docs", "/openapi.json"]:
