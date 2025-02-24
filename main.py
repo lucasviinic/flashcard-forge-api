@@ -36,7 +36,7 @@ async def log_exceptions(request: Request, call_next):
 
 @app.middleware("http")
 async def middleware(request: Request, call_next):
-    if request.url.path in ["/auth/signin", "/docs", "/openapi.json"]:
+    if request.url.path in ["/feedback", "/auth/signin", "/docs", "/openapi.json"]:
         return await call_next(request)
     
     token = request.headers.get("Authorization")
