@@ -15,7 +15,7 @@ dotenv.load_dotenv()
 
 @app.middleware("http")
 async def middleware(request: Request, call_next):
-    if request.url.path in ["/logs", "/feedback", "/auth/signin", "/docs", "/openapi.json"]:
+    if request.url.path in ["/logs", "/auth/signin", "/docs", "/openapi.json"]:
         return await call_next(request)
     
     token = request.headers.get("Authorization")
